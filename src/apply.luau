@@ -136,8 +136,8 @@ local function apply<T>(instance: T & Instance, properties: { [unknown]: unknown
 		(instance :: any)[event_name]:Connect(event_listener)
 	end
 
-	for _, queued in next, actions do
-		for _, callback in next, queued do
+	for _, queued in actions do
+		for _, callback in queued do
 			callback(instance)
 		end
 	end
@@ -152,7 +152,7 @@ local function apply<T>(instance: T & Instance, properties: { [unknown]: unknown
 	end
 
 	table.clear(events)
-	for _, queued in next, actions do
+	for _, queued in actions do
 		table.clear(queued)
 	end
 	caches.parent = nil
