@@ -1,25 +1,27 @@
-local graph = require "./graph"
+local graph = require("./graph")
 type Node<T> = graph.Node<T>
 local get_scope = graph.get_scope
 
 local function untrack<T>(source: () -> T): T
-    local scope = get_scope()
-    
-    if scope then
-        -- sources are only tracked if the node in scope has an effect
-        local effect = scope.effect
-        scope.effect = false
+	local scope = get_scope()
 
-        local ok, result = xpcall(source, debug.traceback)
+	if scope then
+		-- sources are only tracked if the node in scope has an effect
+		local effect = scope.effect
+		scope.effect = false
 
-        scope.effect = effect :: () -> ()
+		local ok, result = xpcall(source, debug.traceback)
 
-        if not ok then error(result, 0) end
+		scope.effect = effect :: () -> ()
 
-        return result :: T
-    else
-        return source()
-    end
+		if not ok then
+			error(result, 0)
+		end
+
+		return result :: T
+	else
+		return source()
+	end
 end
 
-return untrack :: ( <T>(fn: () -> T) -> T ) & ( (fn: () -> ()) -> () )
+return untrack :: (<T>(fn: () -> T) -> T) & ((fn: () -> ()) -> ())
